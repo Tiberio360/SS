@@ -8,6 +8,7 @@ import Stats from '../components/Stats';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import BetaBanner from '@/components/BetaBanner.tsx';
+import Forms from '@/components/forms.tsx';
 
 const Index = () => {
   return (
@@ -18,7 +19,7 @@ const Index = () => {
       <ForRestaurants />
       <ForDelivery />
       <HowItWorks />
-      
+      <Forms />
       <Contact />
       <Footer />
     </div>
