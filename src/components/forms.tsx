@@ -60,7 +60,28 @@ const Forms = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(respuestas);
+
+    const valores = Object.values(respuestas).map(Number);
+    if (valores.length === 0) {
+      alert("Por favor, responde al menos una pregunta.");
+      return;
+    }
+
+    const promedio = valores.reduce((a, b) => a + b, 0) / valores.length;
+
+    let resultado = "";
+
+    if (promedio <= 2.5) {
+      resultado = "Uso equilibrado de redes sociales";
+    } else if (promedio <= 3.5) {
+      resultado = "Posibles señales de estrés digital o comparación social";
+    } else if (promedio <= 4.5) {
+      resultado = "Alto impacto emocional, posible dependencia o baja autoestima relacionada con redes";
+    } else {
+      resultado = "Riesgo alto, se recomienda acompañamiento psicológico o intervención educativa";
+    }
+
+    alert(`Resultado orientativo (solo para interpretación interna)\n\nPromedio: ${promedio.toFixed(2)}\n${resultado}`);
   };
 
   return (
