@@ -46,16 +46,33 @@ const Forms = () => {
 
   const [respuestas, setRespuestas] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
+  const [errores, setErrores] = useState([]);
 
   const handleChange = (pregunta, value) => {
     setRespuestas({
       ...respuestas,
       [pregunta]: Number(value)
     });
+    setErrores(prev => prev.filter(p => p !== pregunta));
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, preguntas.length - 1));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+  const nextStep = () => {
+    const seccionActual = preguntas[currentStep];
+    const respuestasSeccion = seccionActual.items.map(p => respuestas[p]);
+    
+    const nuevasPreguntasSinResponder = seccionActual.items.filter(
+      (p, i) => respuestasSeccion[i] === undefined || respuestasSeccion[i] === null
+    );
+
+    if (nuevasPreguntasSinResponder.length > 0) {
+      setErrores(nuevasPreguntasSinResponder);
+      return; 
+    }
+
+    setCurrentStep(prev => Math.min(prev + 1, preguntas.length - 1));
+  };
+
+  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -85,6 +102,7 @@ const Forms = () => {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4">
+      {/* Barra de progreso */}
       <div className="mb-4 h-2 w-full bg-gray-200 rounded-full">
         <div
           className="h-2 bg-blue-500 rounded-full transition-all duration-500"
@@ -100,15 +118,21 @@ const Forms = () => {
           }`}
         >
           <h3 className="text-xl font-semibold mb-4">{seccion.seccion}</h3>
+
           {seccion.items.map((pregunta, i) => (
             <div key={i} className="mb-3">
               <label className="block">
                 {pregunta}
                 <select
-                  value={respuestas[pregunta] || 1}
+                  value={respuestas[pregunta] || ""}
                   onChange={(e) => handleChange(pregunta, e.target.value)}
-                  className="ml-2 border rounded px-2 py-1"
+                  className={`ml-2 border rounded px-2 py-1 ${
+                    errores.includes(pregunta) ? "border-red-500 bg-red-100" : ""
+                  }`}
                 >
+                  <option value="" disabled>
+                    --Selecciona una opción--
+                  </option>
                   {[1, 2, 3, 4, 5].map((num) => (
                     <option key={num} value={num}>
                       {num}
@@ -121,16 +145,27 @@ const Forms = () => {
 
           <div className="flex justify-between mt-4">
             {currentStep > 0 && (
-              <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-300 rounded">
+              <button
+                type="button"
+                onClick={prevStep}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
                 Anterior
               </button>
             )}
             {currentStep < preguntas.length - 1 ? (
-              <button type="button" onClick={nextStep} className="px-4 py-2 bg-blue-500 text-white rounded">
+              <button
+                type="button"
+                onClick={nextStep}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
                 Siguiente
               </button>
             ) : (
-              <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-500 text-white rounded"
+              >
                 Enviar
               </button>
             )}
