@@ -70,7 +70,7 @@ const ForDelivery = () => {
             <div className="mt-8">
                 <a href="https://t.me/mind_my_emotions_bot" target="_blank"
                    className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors mr-4">
-                    -- Acompañamiento Digital --
+                    Acompañamiento Digital
                 </a>
             </div>
           </div>
