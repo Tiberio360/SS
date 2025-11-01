@@ -23,7 +23,7 @@ const Forms = () => {
       items: [
         "¿Usas redes sociales justo antes de dormir o al despertar?",
         "¿Sientes ansiedad o incomodidad si pasas tiempo sin revisar tus redes?",
-        "¿Has intentado reducir tu tiempo en redes y no lo has logrado?",
+        "¿Has intentado reducir tu tiempo en redes y no lo has logrado?"
       ]
     },
     {
@@ -45,6 +45,7 @@ const Forms = () => {
   ];
 
   const [respuestas, setRespuestas] = useState({});
+  const [currentStep, setCurrentStep] = useState(0);
 
   const handleChange = (pregunta, value) => {
     setRespuestas({
@@ -53,9 +54,11 @@ const Forms = () => {
     });
   };
 
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, preguntas.length - 1));
+  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const valores = Object.values(respuestas).map(Number);
     if (valores.length === 0) {
       alert("Por favor, responde al menos una pregunta.");
@@ -65,7 +68,6 @@ const Forms = () => {
     const promedio = valores.reduce((a, b) => a + b, 0) / valores.length;
 
     let resultado = "";
-
     if (promedio <= 2.5) {
       resultado = "Uso equilibrado de redes sociales";
     } else if (promedio <= 3.5) {
@@ -79,19 +81,33 @@ const Forms = () => {
     alert(`Resultado orientativo (solo para interpretación interna)\n\nPromedio: ${promedio.toFixed(2)}\n${resultado}`);
   };
 
+  const progreso = ((currentStep + 1) / preguntas.length) * 100;
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4">
+      <div className="mb-4 h-2 w-full bg-gray-200 rounded-full">
+        <div
+          className="h-2 bg-blue-500 rounded-full transition-all duration-500"
+          style={{ width: `${progreso}%` }}
+        ></div>
+      </div>
+
       {preguntas.map((seccion, idx) => (
-        <div key={idx} style={{ marginBottom: "20px" }}>
-          <h3>{seccion.seccion}</h3>
+        <div
+          key={idx}
+          className={`transition-opacity duration-500 ${
+            idx === currentStep ? "opacity-100 block" : "opacity-0 hidden"
+          }`}
+        >
+          <h3 className="text-xl font-semibold mb-4">{seccion.seccion}</h3>
           {seccion.items.map((pregunta, i) => (
-            <div key={i} style={{ margin: "5px 0" }}>
-              <label>
+            <div key={i} className="mb-3">
+              <label className="block">
                 {pregunta}
                 <select
                   value={respuestas[pregunta] || 1}
                   onChange={(e) => handleChange(pregunta, e.target.value)}
-                  style={{ marginLeft: "10px" }}
+                  className="ml-2 border rounded px-2 py-1"
                 >
                   {[1, 2, 3, 4, 5].map((num) => (
                     <option key={num} value={num}>
@@ -102,9 +118,25 @@ const Forms = () => {
               </label>
             </div>
           ))}
+
+          <div className="flex justify-between mt-4">
+            {currentStep > 0 && (
+              <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-300 rounded">
+                Anterior
+              </button>
+            )}
+            {currentStep < preguntas.length - 1 ? (
+              <button type="button" onClick={nextStep} className="px-4 py-2 bg-blue-500 text-white rounded">
+                Siguiente
+              </button>
+            ) : (
+              <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">
+                Enviar
+              </button>
+            )}
+          </div>
         </div>
       ))}
-      <button type="submit">Enviar</button>
     </form>
   );
 };
